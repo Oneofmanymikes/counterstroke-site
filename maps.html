@@ -113,6 +113,25 @@ details.key summary { font-family: var(--display); font-weight: 600; letter-spac
 .foot { font-size: .82rem; color: var(--muted); margin-top: 14px; max-width: 75ch; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
+/* event card shown on the map when a marker is tapped */
+.pop { position: absolute; left: 10px; right: 58px; bottom: 10px; max-height: 45%; overflow: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 4px;
+  padding: .55rem .7rem .6rem; font-size: .9rem; line-height: 1.4; box-shadow: 0 2px 10px rgba(0,0,0,.18); touch-action: pan-y; }
+.pop .w { font-family: var(--mono); font-size: .72rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0 .6rem; padding-right: 1.8rem; }
+.pop .w b { font: 700 .85rem var(--display); color: var(--mark); }
+.pop .close { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; font: 600 1.2rem/1 var(--display); background: transparent; color: var(--muted); border: 0; cursor: pointer; }
+.ctl .phone { display: none; }
+.orig { touch-action: auto; }
+.orig .img { touch-action: pan-x pan-y pinch-zoom; }
+@media (max-width: 960px) {
+  header.top h1 { font-size: 1.4rem; }
+  header.top p { font-size: .85rem; line-height: 1.35; }
+  .mapbox { height: 62vh; height: 62dvh; min-height: 340px; }
+  .ctl button { width: 42px; height: 42px; }
+  .ctl .phone { display: block; }
+  .stages button { padding: .3rem .6rem .35rem; }
+  .card { padding: 12px 14px; }
+}
+
 /* svg text */
 svg text { font-family: var(--display); }
 .t-town { fill: var(--town); font-weight: 600; letter-spacing: .04em; }
@@ -126,7 +145,7 @@ svg text { font-family: var(--display); }
 </style>
 
 <div class="wrap">
-  <nav class="sitenav" aria-label="Site" style="margin-bottom:8px"><a href="index.html">← Home</a><a href="book.html">Read the book</a></nav>
+  <nav class="sitenav" aria-label="Site" style="margin-bottom:8px"><a href="index.html">← Home</a><a href="book.html">Read the book</a><a href="index.html#credits">Credits</a></nav>
   <header class="top">
     <h1>Counterstroke Maps</h1>
     <p>The seven maps of Kenneth Macksey’s <em>The Counterstroke</em> (B-GL-309-007/FT-001), redrawn on one sheet.</p>
@@ -141,14 +160,18 @@ svg text { font-family: var(--display); }
           <button id="zout" title="Zoom out" aria-label="Zoom out">−</button>
           <button id="zfit" title="Fit the stage" aria-label="Fit the stage">⤢</button>
           <button id="orig" class="wide" title="Show the original scanned map">Original</button>
+          <button id="pprev" class="phone" title="Previous stage" aria-label="Previous stage">‹</button>
+          <button id="pnext" class="phone" title="Next stage" aria-label="Next stage">›</button>
         </div>
         <div class="stamp" id="stamp"></div>
+        <div class="pop" id="pop" hidden role="status"><button class="close" id="popclose" aria-label="Close">×</button><div class="w" id="popw"></div><div id="popx"></div></div>
         <div class="orig" id="origbox" hidden>
           <div class="bar"><span id="origtitle"></span><button id="origclose">Back to redrawn map</button></div>
           <div class="img"><img id="origimg" alt=""></div>
         </div>
       </div>
       <p class="foot">Grid squares are 1 km, numbered as on the original 1:100,000 sheet (Schwandorf, C 6738). Places with a grid reference in the narrative are placed from it; the others, and all unit positions, are read off the scanned maps and are accurate to about half a kilometre. Rivers and woods are simplified, and the course of the REGEN is approximate. Blue frames are Canadian, teal frames are US, and red diamonds are Fantasian.</p>
+      <p class="foot"><em>The Counterstroke</em> is by Kenneth Macksey, Major (Retd), MC, and was published by the Department of National Defence as B-GL-309-007/FT-001, issued on the authority of the Chief of Defence Staff. The original maps are drawn on the 1:100,000 sheet Schwandorf (C 6738, Series M648), and the scans shown here come from the copy the Canadian Army posted on canada.ca in 2025. The redrawn maps and the stage summaries are new work for this edition, written from the book, and this is not an official version of the publication.</p>
     </div>
     <aside class="side">
       <section class="card" id="stagecard">
@@ -658,9 +681,9 @@ function draw() {
     const g = el("g", { class: "mk", "data-i": i, style: "cursor:pointer" }, mg);
     if (activeEvent === i) el("circle", { cx: x, cy: y, r: r * 2.2, fill: css("--mark"), class: "pulse", opacity: 0 }, g);
     el("line", { x1: X(p[0]), y1: Y(p[1]), x2: x, y2: y + r, stroke: css("--mark"), "stroke-width": px * .07 }, g);
+    el("circle", { cx: x, cy: y, r: Math.max(r * 1.9, 22 / ppu), fill: "transparent" }, g);   // finger-sized tap area
     el("circle", { cx: x, cy: y, r: activeEvent === i ? r * 1.25 : r, fill: css("--mark"), stroke: css("--sheet"), "stroke-width": px * .08 }, g);
     txt(g, x, y + r * .42, String(i + 1), "t-unit", r * 1.15, "middle", { fill: css("--mark-ink") });
-    g.addEventListener("click", e => { e.stopPropagation(); pickEvent(i, false); });
   });
   // grid labels at the sheet edges, as on the original
   const lg = el("g", {}, svg);
@@ -726,20 +749,33 @@ function fillSide() {
   const o = ORIGINALS[stage];
   document.getElementById("orig").hidden = !o;
 }
+const narrow = () => matchMedia("(max-width: 960px)").matches;
+function showPop(i) {
+  const ev = stageData(stage).events[i];
+  document.getElementById("popw").innerHTML = `<b>${i + 1}</b><span>${esc(ev.time || "")}</span><span>${esc(ev.where || "")}</span><span>${ev.grid ? "grid " + esc(ev.grid) : ""}</span>`;
+  document.getElementById("popx").textContent = ev.text;
+  document.getElementById("pop").hidden = false;
+  document.getElementById("stamp").hidden = true;
+}
+function hidePop() { document.getElementById("pop").hidden = true; document.getElementById("stamp").hidden = false; }
 function pickEvent(i, center) {
   activeEvent = i;
   document.querySelectorAll(".ev").forEach(li => li.classList.toggle("on", +li.dataset.i === i));
   const ev = stageData(stage).events[i]; const p = eventEN(ev);
+  if (p) showPop(i); else hidePop();
   if (center && p) {
     const v = Object.assign({}, view);
     const w = Math.min(v.w, 9), h = w * v.h / v.w;
     animateTo({ x: X(p[0]) - w / 2, y: Y(p[1]) - h / 2, w, h });
+    // on a phone the list sits below the map, so bring the map back into view
+    if (narrow()) box.scrollIntoView({ block: "start", behavior: "smooth" });
   } else draw();
-  if (!center) { const li = document.querySelector(`.ev[data-i="${i}"]`); if (li) li.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  if (!center && !narrow()) { const li = document.querySelector(`.ev[data-i="${i}"]`); if (li) li.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
 }
 function go(n) {
   stage = n; activeEvent = null;
   document.getElementById("origbox").hidden = true;
+  hidePop();
   fillSide();
   const fv = fitView(OVERLAYS[n].view);
   ppu0 = box.clientWidth / fv.w;     // the fitted view sets the base size for labels and symbols
@@ -782,15 +818,22 @@ function zoomAt(f, cx, cy) {
   const w = Math.max(1.5, Math.min(80, v.w * f)), h = w * v.h / v.w;
   setView({ x: mx - (mx - v.x) * w / v.w, y: my - (my - v.y) * h / v.h, w, h });
 }
-const pts = new Map(); let last = null, pinch = null, moved = 0;
-svg.addEventListener("pointerdown", e => { svg.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
+const pts = new Map(); let last = null, pinch = null, moved = 0, downMark = null;
+svg.addEventListener("pointerdown", e => {
+  // remember a marker under the finger before capture retargets the events to the svg
+  const mk = e.target.closest && e.target.closest(".mk"); downMark = pts.size === 0 && mk ? +mk.dataset.i : null;
+  svg.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
   if (pts.size === 1) { last = [e.clientX, e.clientY]; svg.classList.add("drag"); }
   if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } });
 svg.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
   if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); zoomAt(pinch.d / d, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); pinch.d = d; return; }
   if (pts.size === 1 && last) { const r = svg.getBoundingClientRect(); const dx = (e.clientX - last[0]) / r.width * view.w, dy = (e.clientY - last[1]) / r.height * view.h; moved += Math.abs(dx) + Math.abs(dy);
     last = [e.clientX, e.clientY]; setView({ x: view.x - dx, y: view.y - dy, w: view.w, h: view.h }); } });
-const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (pts.size === 0) { last = null; svg.classList.remove("drag"); } else { const v = [...pts.values()][0]; last = v; } };
+const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
+  if (pts.size === 0) { last = null; svg.classList.remove("drag");
+    if (e.type === "pointerup" && downMark !== null && moved < view.w * .012) pickEvent(downMark, false);
+    downMark = null; }
+  else { const v = [...pts.values()][0]; last = v; downMark = null; } };
 svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up);
 svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(Math.exp(e.deltaY * .0015), e.clientX, e.clientY); }, { passive: false });
 document.getElementById("zin").onclick = () => { const r = svg.getBoundingClientRect(); zoomAt(.7, r.left + r.width / 2, r.top + r.height / 2); };
@@ -798,6 +841,10 @@ document.getElementById("zout").onclick = () => { const r = svg.getBoundingClien
 document.getElementById("zfit").onclick = () => animateTo(fitView(OVERLAYS[stage].view));
 document.getElementById("prev").onclick = () => stage > 1 && go(stage - 1);
 document.getElementById("next").onclick = () => stage < 7 && go(stage + 1);
+document.getElementById("pprev").onclick = () => stage > 1 && go(stage - 1);
+document.getElementById("pnext").onclick = () => stage < 7 && go(stage + 1);
+document.getElementById("popclose").onclick = () => { activeEvent = null; hidePop(); document.querySelectorAll(".ev.on").forEach(li => li.classList.remove("on")); draw(); };
+if (narrow()) document.querySelector("details.key").removeAttribute("open");
 document.getElementById("orig").onclick = () => { const o = ORIGINALS[stage]; if (!o) return;
   document.getElementById("origimg").src = o.src; document.getElementById("origimg").alt = "Original scanned map: " + o.title;
   document.getElementById("origtitle").textContent = "Original: " + o.title; document.getElementById("origbox").hidden = false; };

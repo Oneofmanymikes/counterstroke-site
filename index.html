@@ -34,6 +34,13 @@ h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 7vw
 .go .arrow { color: var(--blue); }
 .small { font-size: .92rem; }
 .small a { color: var(--blue); }
+.credits { border-top: 1px solid var(--rule); margin-top: 2.2rem; padding-top: 1.2rem; }
+.credits h2 { font-family: var(--display); font-weight: 700; font-size: 1.5rem; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 .8rem; }
+.credits dl { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: .55rem 1.2rem; margin: 0; font-size: .95rem; }
+.credits dt { font-family: var(--display); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.credits dd { margin: 0; max-width: 70ch; }
+.credits a { color: var(--blue); }
+@media (max-width: 680px) { .credits dl { grid-template-columns: minmax(0, 1fr); gap: .15rem; } .credits dd { margin-bottom: .6rem; } }
 footer { border-top: 1px solid var(--rule); margin-top: 2rem; padding-top: 1rem; font-size: .85rem; color: var(--muted); }
 footer p { margin: 0 0 .6rem; max-width: 80ch; }
 footer a { color: inherit; }
@@ -62,11 +69,28 @@ footer a { color: inherit; }
     </a>
   </nav>
 
-  <p class="small">The book is also available as a <a href="The%20Counterstroke%20-%20Macksey%20(clean%20edition).pdf">PDF</a> (7 by 10 inches, about 17 MB). The original scan is on <a href="https://www.canada.ca/content/dam/dnd-mdn/army/lineofsight/articleimages/2025/01/Counterstroke-B-GL-309-007FT-001-OCR-lr.pdf">canada.ca</a>.</p>
+  <p class="small">The book is also available as a <a href="The%20Counterstroke%20-%20Macksey%20(clean%20edition).pdf">PDF</a> (7 by 10 inches, about 17 MB). The original scan is on <a href="https://www.canada.ca/content/dam/dnd-mdn/army/lineofsight/articleimages/2025/01/Counterstroke-B-GL-309-007FT-001-OCR-lr.pdf">canada.ca</a>, and the <a href="#credits">credits</a> are below.</p>
+
+  <section class="credits" id="credits" aria-labelledby="credits-h">
+    <h2 id="credits-h">Credits and source</h2>
+    <dl>
+      <dt>Author</dt>
+      <dd>Kenneth Macksey, Major (Retd), MC. The book’s preface describes him as a former officer in the Royal Tank Regiment who saw action in Western Europe and as a well-known military writer. He also wrote <em>First Clash</em>, the first book in the series.</dd>
+      <dt>Publisher</dt>
+      <dd>Department of National Defence, Canada, as publication B-GL-309-007/FT-001. The book is issued on the authority of the Chief of Defence Staff, and readers’ comments were to be sent to Force Mobile Command (FMC) Headquarters, Attention: SO2 Doctrine Coordination.</dd>
+      <dt>Date</dt>
+      <dd>The copy does not print a date of publication. The story is set in 1990, and the scanned copy carries a 1992 library catalogue mark.</dd>
+      <dt>Photographs and maps</dt>
+      <dd>The photographs, diagrams and maps are reproduced from the original publication, which does not credit individual photographers. The original maps are drawn on the 1:100,000 map sheet Schwandorf (C 6738, Series M648).</dd>
+      <dt>Source of this copy</dt>
+      <dd>The scanned copy that the Canadian Army posted on <a href="https://www.canada.ca/content/dam/dnd-mdn/army/lineofsight/articleimages/2025/01/Counterstroke-B-GL-309-007FT-001-OCR-lr.pdf">canada.ca</a> in 2025, made from the copy held by the Land Force Command Headquarters Main Library.</dd>
+      <dt>This edition</dt>
+      <dd>The re-typesetting, the OCR corrections, the cleaned-up images, the grey bracketed expansions of abbreviations, the redrawn maps and the stage summaries and events on the maps page are new work for this edition. The summaries and events are written from the book’s text, and the wording, spelling and punctuation of the book itself follow the printed original.</dd>
+    </dl>
+  </section>
 
   <footer>
-    <p>The original publication is <em>The Counterstroke</em>, B-GL-309-007/FT-001, published by the Department of National Defence, and is reproduced here from the scanned copy on canada.ca for non-commercial use. This is not an official version of the original publication, and it has not been produced in affiliation with, or with the endorsement of, the Government of Canada.</p>
-    <p>The text was corrected for OCR errors against the page images, and the wording, spelling and punctuation follow the printed original. The grey bracketed expansions of abbreviations, the redrawn maps and the stage summaries were added for this edition.</p>
+    <p>The original publication is reproduced here from the scanned copy on canada.ca for non-commercial use. This is not an official version of the original publication, and it has not been produced in affiliation with, or with the endorsement of, the Government of Canada. The inferences drawn and the opinions expressed in the book are those of its author, and its characters and incidents are fictitious.</p>
   </footer>
 </main>
 </body>
