@@ -411,7 +411,7 @@ const ORIGINALS = {"1": {"title": "Opening Situation", "src": "data:image/webp;b
 const NS = "http://www.w3.org/2000/svg";
 const svg = document.getElementById("map");
 const box = document.getElementById("mapbox");
-let stage = 1, view = null, ppu = 10;
+let stage = 1, view = null, ppu = 10, ppu0 = 0;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
 // map coordinates: x = E, y = 100 - N
@@ -603,7 +603,11 @@ let activeEvent = null;
 function draw() {
   if (!view) return;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
-  const px = 14 / ppu;               // one "screen unit" of about 14 px, in map km
+  // labels and symbols grow as you zoom in past the stage's fitted view, more slowly than the map itself,
+  // and shrink a little when you zoom out; grid numbers and the scale bar (pxc) stay a fixed size on screen
+  const zoomGain = Math.min(3.2, Math.max(.7, Math.pow(ppu / (ppu0 || ppu), .6)));
+  const pxc = 14 / ppu;
+  const px = pxc * zoomGain;          // one "screen unit" of about 14 px at the fitted view, in map km
   const x0 = view.x, x1 = view.x + view.w, y0 = view.y, y1 = view.y + view.h;
   el("rect", { x: x0 - 50, y: y0 - 50, width: view.w + 100, height: view.h + 100, fill: css("--sheet") }, svg);
   const base = el("g", {}, svg);
@@ -660,14 +664,15 @@ function draw() {
   });
   // grid labels at the sheet edges, as on the original
   const lg = el("g", {}, svg);
-  for (let e = Math.ceil(x0 / step) * step; e <= x1; e += step) if (e > x0 + px) txt(lg, e + px * .12, y0 + px * .7, two(e), "t-grid halo", px * .55, "start", { "stroke-width": px * .16 });
-  for (let yy = Math.ceil(y0 / step) * step; yy <= y1; yy += step) if (yy > y0 + px * 1.2) txt(lg, x0 + px * .25, yy - px * .15, two(100 - yy), "t-grid halo", px * .55, "start", { "stroke-width": px * .16 });
+  const q = pxc;
+  for (let e = Math.ceil(x0 / step) * step; e <= x1; e += step) if (e > x0 + q) txt(lg, e + q * .12, y0 + q * .7, two(e), "t-grid halo", q * .55, "start", { "stroke-width": q * .16 });
+  for (let yy = Math.ceil(y0 / step) * step; yy <= y1; yy += step) if (yy > y0 + q * 1.2) txt(lg, x0 + q * .25, yy - q * .15, two(100 - yy), "t-grid halo", q * .55, "start", { "stroke-width": q * .16 });
   // scale bar
-  const km = ppu > 40 ? 1 : ppu > 15 ? 2 : 5;
-  const sx = x1 - km - px * 1.2, sy = y1 - px * 1.2;
-  el("rect", { x: sx - px * .3, y: sy - px * .95, width: km + px * .6, height: px * 1.35, fill: css("--halo") }, lg);
-  el("path", { d: `M${sx} ${sy - px * .25} L${sx} ${sy} L${sx + km} ${sy} L${sx + km} ${sy - px * .25}`, fill: "none", stroke: css("--ink"), "stroke-width": px * .08 }, lg);
-  txt(lg, sx + km / 2, sy - px * .3, km + " km", "t-grid", px * .5, "middle");
+  const km = ppu > 80 ? .5 : ppu > 40 ? 1 : ppu > 15 ? 2 : 5;
+  const sx = x1 - km - q * 1.2, sy = y1 - q * 1.2;
+  el("rect", { x: sx - q * .3, y: sy - q * .95, width: km + q * .6, height: q * 1.35, fill: css("--halo") }, lg);
+  el("path", { d: `M${sx} ${sy - q * .25} L${sx} ${sy} L${sx + km} ${sy} L${sx + km} ${sy - q * .25}`, fill: "none", stroke: css("--ink"), "stroke-width": q * .08 }, lg);
+  txt(lg, sx + km / 2, sy - q * .3, (km < 1 ? "500 m" : km + " km"), "t-grid", q * .5, "middle");
 }
 function stageNames() {
   const s = new Set();
@@ -736,7 +741,9 @@ function go(n) {
   stage = n; activeEvent = null;
   document.getElementById("origbox").hidden = true;
   fillSide();
-  animateTo(fitView(OVERLAYS[n].view));
+  const fv = fitView(OVERLAYS[n].view);
+  ppu0 = box.clientWidth / fv.w;     // the fitted view sets the base size for labels and symbols
+  animateTo(fv);
   const b = document.querySelector(`#stages button[data-n="${n}"]`); if (b) b.scrollIntoView({ inline: "nearest", block: "nearest" });
   if (location.hash !== "#stage-" + n) history.replaceState(null, "", "#stage-" + n);
 }
