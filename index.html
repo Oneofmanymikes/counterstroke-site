@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Counterstroke</title>
+<meta name="description" content="A cleaned-up and re-typeset edition of Kenneth Macksey's narrative wargame The Counterstroke, with its seven maps redrawn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: one column, the cover beside the title on wide screens, then two large links to the book and the maps. */
+:root {
+  --bg: #f4f6f1; --fg: #1b221d; --muted: #5d6a60; --rule: #c9d2c6; --card: #ffffff; --accent: #8a2b1e; --blue: #1d5bb8;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif; --text: "Source Serif 4", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root { --bg: #121815; --fg: #e2e8e1; --muted: #9aa69c; --rule: #2f3a32; --card: #18201b; --accent: #e08a73; --blue: #74abff; color-scheme: dark; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { font-family: var(--text); font-size: 17px; line-height: 1.55; }
+main { max-width: 60rem; margin: 0 auto; padding: 2.2rem max(16px, env(safe-area-inset-right, 0px)) 3rem max(16px, env(safe-area-inset-left, 0px)); }
+.hero { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2rem; align-items: center; }
+@media (max-width: 680px) { .hero { grid-template-columns: minmax(0, 1fr); } .hero img { width: 11rem; } }
+.hero img { width: 100%; height: auto; box-shadow: 0 2px 14px rgba(0,0,0,.2); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 7vw, 3.6rem); letter-spacing: .06em; text-transform: uppercase; line-height: 1; margin: 0 0 .4rem; }
+.by { font-family: var(--display); font-size: 1.3rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+.hero p { margin: 0 0 .8rem; max-width: 62ch; }
+.go { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 2.4rem 0; }
+@media (max-width: 680px) { .go { grid-template-columns: minmax(0, 1fr); } }
+.go a { display: block; text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 1.1rem 1.2rem 1.2rem; }
+.go a:hover, .go a:focus-visible { border-color: var(--fg); outline: none; }
+.go h2 { font-family: var(--display); font-weight: 700; font-size: 1.6rem; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 .3rem; }
+.go p { margin: 0; color: var(--muted); font-size: .95rem; }
+.go .arrow { color: var(--blue); }
+.small { font-size: .92rem; }
+.small a { color: var(--blue); }
+footer { border-top: 1px solid var(--rule); margin-top: 2rem; padding-top: 1rem; font-size: .85rem; color: var(--muted); }
+footer p { margin: 0 0 .6rem; max-width: 80ch; }
+footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <img src="images/cover.jpg" alt="Original cover of The Counterstroke" width="384" height="497">
+    <div>
+      <h1>The Counterstroke</h1>
+      <p class="by">Kenneth Macksey</p>
+      <p><em>The Counterstroke</em> is a narrative wargame that Kenneth Macksey wrote for the Canadian Army around 1990 (B-GL-309-007/FT-001), and it follows a fictional 7 Canadian Mechanized Brigade Group in Bavaria as it moves from a week of defensive fighting to a counter-attack against Soviet-style “Fantasian” forces.</p>
+      <p>The story runs from the warning order and the orders groups through the covering force battle, a hasty attack and then a deliberate crossing of the Schwarzach River, the breakout and a chemical attack, and ends in the pursuit, and it is told through the commanders and soldiers on both sides. It is the successor to Macksey’s <em>First Clash</em>, and each chapter closes with a page of lessons learned, so the book can be read as a story and also used to teach how a brigade plans and fights an attack.</p>
+    </div>
+  </section>
+
+  <nav class="go" aria-label="Contents of this site">
+    <a href="book.html">
+      <h2>Read the book <span class="arrow">→</span></h2>
+      <p>The full text, re-typeset in one column, with the photographs, maps and diagrams cleaned up from the scan and the orders and lessons learned set as text. Acronyms are spelled out the first time they appear in each chapter.</p>
+    </a>
+    <a href="maps.html">
+      <h2>Explore the maps <span class="arrow">→</span></h2>
+      <p>The book’s seven maps redrawn on one sheet with the original 1 km grid, with the units, axes and lines for each stage, the narrative’s events plotted, and the original scans for comparison.</p>
+    </a>
+  </nav>
+
+  <p class="small">The book is also available as a <a href="The%20Counterstroke%20-%20Macksey%20(clean%20edition).pdf">PDF</a> (7 by 10 inches, about 17 MB). The original scan is on <a href="https://www.canada.ca/content/dam/dnd-mdn/army/lineofsight/articleimages/2025/01/Counterstroke-B-GL-309-007FT-001-OCR-lr.pdf">canada.ca</a>.</p>
+
+  <footer>
+    <p>The original publication is <em>The Counterstroke</em>, B-GL-309-007/FT-001, published by the Department of National Defence, and is reproduced here from the scanned copy on canada.ca for non-commercial use. This is not an official version of the original publication, and it has not been produced in affiliation with, or with the endorsement of, the Government of Canada.</p>
+    <p>The text was corrected for OCR errors against the page images, and the wording, spelling and punctuation follow the printed original. The grey bracketed expansions of abbreviations, the redrawn maps and the stage summaries were added for this edition.</p>
+  </footer>
+</main>
+</body>
+</html>
